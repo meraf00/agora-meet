@@ -10,6 +10,7 @@ import (
 )
 
 type Message struct {
+	UserId  string `json:"userId"`
 	Type    string `json:"type"`
 	Payload string `json:"payload"`
 }
@@ -55,12 +56,14 @@ func handleConnections(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
+		fmt.Println(msg.Type, msg.UserId)
+
 		for _, c := range meetings[meetingId] {
-			if c != conn {
+			if c != conn && clients[c] {
 				err := c.WriteJSON(msg)
 
 				if err != nil {
-					fmt.Println(err)
+					fmt.Println("Error:", err)
 					delete(clients, c)
 				}
 			}
