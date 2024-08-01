@@ -1,17 +1,26 @@
 import type { SignalingChannel } from './type';
 
-const configuration = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] };
+const configuration = {
+	iceServers: [{ urls: 'stun:stun.l.google.com:19302' }],
+	offerToReceiveVideo: true
+};
 
 export async function initializeConnectionAndSendOffer(
 	signalingChannel: SignalingChannel,
 	id: string,
-	localStream: MediaStream
+	localStream: MediaStream,
+	remoteVideo: HTMLVideoElement
 ) {
 	const peerConnection = new RTCPeerConnection(configuration);
 
 	localStream.getTracks().forEach((track) => {
 		peerConnection.addTrack(track, localStream);
 	});
+
+	peerConnection.ontrack = (event) => {
+		const [remoteStream] = event.streams;
+		remoteVideo.srcObject = remoteStream;
+	};
 
 	peerConnection.onicecandidate = (event) => {
 		if (event.candidate) {
@@ -42,13 +51,19 @@ export async function acceptOffer(
 	offer: any,
 	signalingChannel: SignalingChannel,
 	id: string,
-	localStream: MediaStream
+	localStream: MediaStream,
+	remoteVideo: HTMLVideoElement
 ) {
 	const peerConnection = new RTCPeerConnection(configuration);
 
 	localStream.getTracks().forEach((track) => {
 		peerConnection.addTrack(track, localStream);
 	});
+
+	peerConnection.ontrack = (event) => {
+		const [remoteStream] = event.streams;
+		remoteVideo.srcObject = remoteStream;
+	};
 
 	peerConnection.onicecandidate = (event) => {
 		if (event.candidate) {

@@ -2,7 +2,7 @@
 	import Video from '../video.svelte';
 	import { PhoneIcon } from 'lucide-svelte';
 	import { onMount } from 'svelte';
-	import { getConnectedDevices, onConnectedDevicesChange } from '$lib/media';
+	import { onConnectedDevicesChange } from '$lib/media';
 	import {
 		acceptOffer,
 		addIceCandidate,
@@ -15,8 +15,6 @@
 	let { meetingId, userId } = data;
 
 	onMount(async () => {
-		console.log(await getConnectedDevices('videoinput'));
-
 		onConnectedDevicesChange(console.log);
 
 		const socket = new WebSocket(`ws://localhost:3000/ws/${meetingId}`);
@@ -44,23 +42,17 @@
 			const message = JSON.parse(event.data);
 
 			if (message.type === 'user:join') {
-				const pc = await initializeConnectionAndSendOffer(socket, userId, localStream);
+				const pc = await initializeConnectionAndSendOffer(socket, userId, localStream, remoteVideo);
 				peerConnections[message.userId] = pc;
-
-				pc.ontrack = (event) => {
-					console.log('Track:', event);
-					const [remoteStream] = event.streams;
-					remoteVideo.srcObject = remoteStream;
-				};
 			} else if (message.type === 'rtc:offer') {
-				const pc = await acceptOffer(JSON.parse(message.payload), socket, userId, localStream);
+				const pc = await acceptOffer(
+					JSON.parse(message.payload),
+					socket,
+					userId,
+					localStream,
+					remoteVideo
+				);
 				peerConnections[message.userId] = pc;
-
-				pc.ontrack = (event) => {
-					console.log('Track:', event);
-					const [remoteStream] = event.streams;
-					remoteVideo.srcObject = remoteStream;
-				};
 			} else if (message.type === 'rtc:answer') {
 				setRemoteDescription(JSON.parse(message.payload), peerConnections[message.userId]);
 			} else if (message.type === 'rtc:icecandidate') {
