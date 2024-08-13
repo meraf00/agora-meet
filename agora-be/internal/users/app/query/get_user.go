@@ -15,7 +15,7 @@ type UserHandler struct {
 	userRepo users.Repository
 }
 
-func NewGetUserHandler(userRepo users.Repository) *UserHandler {
+func NewUserHandler(userRepo users.Repository) *UserHandler {
 	if userRepo == nil {
 		panic("nil userRepo")
 	}
