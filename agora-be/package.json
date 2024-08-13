@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "dev": "nodemon -e go --signal SIGKILL --exec go run main.go"
+    "dev": "nodemon -e go --signal SIGKILL --exec \"go build -o server.exe && server.exe\""
   },
   "devDependencies": {
     "nodemon": "^3.1.4"
