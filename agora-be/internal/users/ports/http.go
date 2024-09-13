@@ -19,9 +19,22 @@ func NewHttpServer(app app.Application, router *gin.Engine) HttpServer {
 	}
 
 	userRoutes := router.Group("/users")
+	userRoutes.GET("/", server.GetUsersList)
 	userRoutes.GET("/:id", server.GetProfileDetail)
 
 	return server
+}
+
+func (h HttpServer) GetUsersList(ctx *gin.Context) {
+	result, err := h.app.Queries.Users.Handle(ctx.Request.Context())
+
+	if err != nil {
+		fmt.Println(err)
+		ctx.AbortWithStatus(http.StatusInternalServerError)
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{"data": result})
 }
 
 func (h HttpServer) GetProfileDetail(ctx *gin.Context) {

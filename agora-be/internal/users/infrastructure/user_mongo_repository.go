@@ -66,6 +66,31 @@ func (r *UserMongoRepository) FindUser(ctx context.Context, id string) (*entitie
 
 }
 
+func (r *UserMongoRepository) FindUsers(ctx context.Context) ([]*entities.User, error) {
+	var users []*entities.User
+
+	cur, err := r.collection.Find(ctx, bson.D{})
+
+	if err != nil {
+		return nil, err
+	}
+
+	for cur.Next(ctx) {
+		var user models.UserModel
+		if err := cur.Decode(&user); err != nil {
+			return nil, err
+		}
+
+		users = append(users, &entities.User{
+			Email: user.Email,
+			Id:    user.Id,
+			Name:  user.Name,
+		})
+	}
+
+	return users, nil
+}
+
 func (r *UserMongoRepository) SaveUser(ctx context.Context, user entities.User) error {
 	return nil
 }

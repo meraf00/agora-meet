@@ -17,7 +17,8 @@ type Commands struct {
 }
 
 type Queries struct {
-	User query.UserHandler
+	User  query.UserHandler
+	Users query.UsersHandler
 }
 
 func NewApplication(ctx context.Context) Application {
@@ -36,7 +37,8 @@ func NewApplication(ctx context.Context) Application {
 		Commands: Commands{},
 
 		Queries: Queries{
-			User: *query.NewUserHandler(userRepo),
+			User:  *query.NewUserHandler(userRepo),
+			Users: *query.NewUsersHandler(userRepo),
 		},
 	}
 

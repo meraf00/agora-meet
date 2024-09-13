@@ -9,4 +9,5 @@ import (
 type Repository interface {
 	FindUser(ctx context.Context, id string) (*entities.User, error)
 	SaveUser(ctx context.Context, user entities.User) error
+	FindUsers(ctx context.Context) ([]*entities.User, error)
 }
